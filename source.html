@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Creator aiOS 4.7 PRO - Multi-Lang</title>
+    <title>aiOS 4.8 PRO Resizable</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap');
@@ -12,8 +12,8 @@
             --glass: rgba(10, 10, 20, 0.94);
             --glass-border: rgba(255, 255, 255, 0.1);
             --accent: #8b5cf6;
-            --accent-glow: rgba(139, 92, 246, 0.5);
             --success: #10b981;
+            --danger: #ef4444;
         }
 
         body, html {
@@ -22,8 +22,8 @@
             height: 100vh; width: 100vw;
             overflow: hidden; background: #010103; color: white;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(88, 28, 135, 0.2) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(30, 58, 138, 0.2) 0%, transparent 40%);
+                radial-gradient(circle at 15% 25%, rgba(139, 92, 246, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(16, 185, 129, 0.1) 0%, transparent 45%);
         }
 
         .brand { font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
@@ -32,8 +32,8 @@
             position: relative; width: 100vw; height: 100vh;
             padding: 40px 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fill, 100px);
-            grid-template-rows: repeat(auto-fill, 110px);
+            grid-template-columns: repeat(auto-fill, 110px);
+            grid-template-rows: repeat(auto-fill, 120px);
             grid-auto-flow: column;
             gap: 15px;
             z-index: 10;
@@ -43,454 +43,383 @@
             display: flex; flex-direction: column; align-items: center; gap: 8px;
             cursor: pointer; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 12px 5px; border-radius: 12px; border: 1px solid transparent;
-            user-select: none;
+            user-select: none; position: relative;
         }
         .shortcut:hover { background: rgba(255,255,255,0.07); border-color: var(--glass-border); transform: translateY(-3px); }
+        
         .shortcut-icon {
-            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
-            font-size: 26px; border-radius: 14px; background: rgba(255,255,255,0.05);
+            width: 58px; height: 58px; display: flex; align-items: center; justify-content: center;
+            font-size: 28px; border-radius: 16px; background: rgba(255,255,255,0.05);
             backdrop-filter: blur(10px); border: 1px solid var(--glass-border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
-        .shortcut-label { font-size: 10px; font-weight: 500; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.9); max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .shortcut-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .shortcut-label { font-size: 11px; font-weight: 500; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.9); }
 
         .window {
             position: absolute; background: var(--glass); backdrop-filter: blur(40px);
-            border: 1px solid var(--glass-border); border-radius: 14px;
+            border: 1px solid var(--glass-border); border-radius: 16px;
             display: none; flex-direction: column; z-index: 100;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
-            min-width: 320px; min-height: 200px;
-            overflow: hidden;
+            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.8);
+            min-width: 300px; min-height: 200px;
+            overflow: visible; /* Дозволяє відображати ручки ресайзу */
         }
-        .window-active { z-index: 300 !important; border-color: rgba(139, 92, 246, 0.4); box-shadow: 0 0 30px rgba(139, 92, 246, 0.2); }
+        .window-active { z-index: 500 !important; border-color: var(--accent); }
         
         .window-header {
-            height: 38px; background: rgba(255,255,255,0.04);
-            display: flex; align-items: center; padding: 0 12px; cursor: move;
+            height: 42px; background: rgba(255,255,255,0.04);
+            display: flex; align-items: center; padding: 0 16px; cursor: move;
             justify-content: space-between; border-bottom: 1px solid var(--glass-border);
+            flex-shrink: 0;
+            border-radius: 16px 16px 0 0;
         }
 
-        .control-btn { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; transition: 0.2s; }
+        .control-btn { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; }
         .btn-close { background: #ff5f56; }
 
+        /* Resize Handles */
         .resizer {
-            position: absolute; right: 0; bottom: 0; width: 15px; height: 15px;
-            cursor: nwse-resize; z-index: 10; background: linear-gradient(135deg, transparent 70%, rgba(255,255,255,0.2) 100%);
+            position: absolute;
+            background: transparent;
         }
+        .resizer-r { cursor: e-resize; width: 8px; right: -4px; top: 0; bottom: 0; }
+        .resizer-b { cursor: s-resize; height: 8px; bottom: -4px; left: 0; right: 0; }
+        .resizer-rb { cursor: se-resize; width: 12px; height: 12px; right: -4px; bottom: -4px; z-index: 10; }
+
+        #context-menu {
+            position: fixed; display: none; background: #1a1a2e; border: 1px solid var(--glass-border);
+            border-radius: 8px; padding: 5px; z-index: 2000; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            min-width: 150px;
+        }
+        .menu-item {
+            padding: 8px 12px; font-size: 12px; cursor: pointer; border-radius: 4px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .menu-item:hover { background: var(--accent); }
+        .menu-item.danger:hover { background: var(--danger); }
 
         .taskbar {
-            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
-            background: rgba(15, 15, 25, 0.85); backdrop-filter: blur(25px);
-            padding: 8px 15px; border-radius: 20px; border: 1px solid var(--glass-border);
-            display: flex; gap: 12px; z-index: 1000; align-items: center;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(15, 15, 25, 0.8); backdrop-filter: blur(30px);
+            padding: 10px 20px; border-radius: 24px; border: 1px solid var(--glass-border);
+            display: flex; gap: 15px; z-index: 1000; align-items: center;
         }
 
         .dock-item {
-            width: 42px; height: 42px; border-radius: 10px; display: flex; 
-            align-items: center; justify-content: center; font-size: 22px;
-            cursor: pointer; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 46px; height: 46px; border-radius: 12px; display: flex; 
+            align-items: center; justify-content: center; font-size: 24px;
+            cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             background: rgba(255,255,255,0.03);
         }
         .dock-item:hover { transform: scale(1.2) translateY(-10px); background: var(--accent); }
 
-        .lang-btn {
-            background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 6px;
-            font-size: 10px; font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);
+        .loading-spinner {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 24px; height: 24px;
+            animation: spin 1s linear infinite;
         }
-        .lang-btn:hover { background: var(--accent); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .loader-dot { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-        #word-editor {
-            width: 100%; height: 100%; padding: 25px; outline: none;
-            background: transparent; color: #eee; font-size: 15px; line-height: 1.6;
+        #icon-preview {
+            width: 80px; height: 80px; border-radius: 16px; background: rgba(0,0,0,0.3);
+            border: 1px dashed var(--glass-border); display: flex; align-items: center; justify-content: center;
+            overflow: hidden; margin-top: 10px; flex-shrink: 0;
         }
+        #icon-preview img { width: 100%; height: 100%; object-fit: cover; }
+        
+        iframe { pointer-events: auto; }
+        .window-resizing iframe { pointer-events: none; } /* Щоб iframe не перехоплював події миші при ресайзі */
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
     <div id="desktop">
-        <!-- Shortcut Factory -->
         <div class="shortcut" onclick="openWin('factory')">
-            <div class="shortcut-icon" style="border-color: var(--success); color: var(--success);">🛠️</div>
-            <div class="shortcut-label" data-i18n="factory_label">App Factory</div>
+            <div class="shortcut-icon" style="color: var(--success); border-color: var(--success);">🛠️</div>
+            <div class="shortcut-label">App Factory</div>
         </div>
-        <!-- Shortcut AI Word -->
-        <div class="shortcut" onclick="openWin('word')">
-            <div class="shortcut-icon" style="border-color: #3b82f6; color: #3b82f6;">📝</div>
-            <div class="shortcut-label" data-i18n="word_label">AI Word</div>
-        </div>
-        <!-- Shortcut Terminal -->
         <div class="shortcut" onclick="openWin('terminal')">
             <div class="shortcut-icon">💻</div>
-            <div class="shortcut-label" data-i18n="terminal_label">Terminal</div>
+            <div class="shortcut-label">Terminal</div>
         </div>
     </div>
 
-    <!-- Factory Window -->
-    <div class="window" id="win-factory" style="width: 420px; height: 480px; top: 100px; left: 100px;">
+    <div id="context-menu">
+        <div class="menu-item danger" onclick="deleteTargetApp()">
+            <span>🗑️</span> Видалити додаток
+        </div>
+    </div>
+
+    <!-- Window: Factory -->
+    <div class="window" id="win-factory" style="width: 500px; height: 600px; top: 50px; left: 100px;" onmousedown="focusWin('factory')">
         <div class="window-header">
-            <span class="brand text-[9px] opacity-70" data-i18n="factory_title">App Factory v4.7</span>
+            <span class="brand text-[10px] opacity-70">App Factory PRO</span>
             <div class="control-btn btn-close" onclick="closeWin('factory')"></div>
         </div>
-        <div class="p-6 flex flex-col h-full bg-black/20">
-            <h2 class="text-xl font-bold mb-1 text-emerald-400" data-i18n="factory_header">Створити програму</h2>
-            <p class="text-[11px] opacity-40 mb-6 tracking-wider uppercase" data-i18n="factory_sub">AI GENERATION FOR YOUR DESKTOP</p>
+        <div class="p-6 flex flex-col h-full bg-black/40 overflow-y-auto">
+            <h2 class="text-2xl font-bold text-emerald-400 mb-6">Створити Додаток</h2>
             
-            <div class="space-y-4 flex-grow">
+            <div class="space-y-5">
                 <div>
-                    <label class="text-[10px] uppercase opacity-50 mb-1 block" data-i18n="field_name">Назва додатка</label>
-                    <input type="text" id="app-name" placeholder="..." class="w-full bg-white/5 border border-white/10 rounded-lg p-3 outline-none focus:border-emerald-500 transition text-sm">
+                    <label class="text-[10px] uppercase font-bold opacity-50 mb-2 block">Назва</label>
+                    <input type="text" id="app-name" placeholder="Напр: Music Player" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500 transition">
                 </div>
+                
                 <div>
-                    <label class="text-[10px] uppercase opacity-50 mb-1 block" data-i18n="field_desc">Опис функцій</label>
-                    <textarea id="app-desc" placeholder="..." class="w-full bg-white/5 border border-white/10 rounded-lg p-3 outline-none focus:border-emerald-500 transition text-sm h-32 resize-none"></textarea>
+                    <label class="text-[10px] uppercase font-bold opacity-50 mb-2 block">Опис (Функції)</label>
+                    <textarea id="app-desc" placeholder="Що має робити ваш додаток?" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 outline-none focus:border-emerald-500 transition h-20 resize-none"></textarea>
+                </div>
+
+                <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <label class="text-[10px] uppercase font-bold opacity-50 mb-3 block">Дизайн іконки</label>
+                    <div class="flex items-start gap-4">
+                        <div id="icon-preview">
+                            <span class="text-[10px] opacity-20">NO ICON</span>
+                        </div>
+                        <div class="flex-grow pt-2">
+                            <button id="gen-icon-btn" onclick="generateAppIcon()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2">
+                                <span>🎨 Згенерувати іконку</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-4 pt-4 border-t border-white/5">
-                <button id="build-btn" onclick="buildApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-bold text-xs uppercase tracking-widest transition active:scale-95" data-i18n="btn_build">
-                    Згенерувати ✨
-                </button>
-                <div id="build-status" class="mt-3 text-[10px] font-mono text-emerald-500/80 text-center min-h-[1em]"></div>
+            <div class="mt-auto pt-6">
+                <button id="build-btn" onclick="buildApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-xl font-bold uppercase tracking-widest transition-all">Встановити ✨</button>
+                <div id="build-status" class="mt-2 text-[10px] font-mono text-emerald-400 text-center italic h-4"></div>
             </div>
         </div>
-        <div class="resizer"></div>
     </div>
 
-    <!-- AI Word Window -->
-    <div class="window" id="win-word" style="width: 700px; height: 550px; top: 80px; left: 150px;">
+    <!-- Window: Terminal -->
+    <div class="window" id="win-terminal" style="width: 600px; height: 400px; top: 200px; left: 400px;" onmousedown="focusWin('terminal')">
         <div class="window-header">
-            <span class="brand text-[9px] opacity-70" data-i18n="word_title">AI Word Processor</span>
-            <div class="control-btn btn-close" onclick="closeWin('word')"></div>
-        </div>
-        <div class="flex flex-col h-full">
-            <div class="p-2 border-b border-white/10 bg-white/5 flex gap-2">
-                <button onclick="aiTextTask('improve')" class="bg-blue-600/30 hover:bg-blue-600 text-[10px] px-3 py-1 rounded border border-blue-500/30 transition" data-i18n="btn_fix">Виправити ✨</button>
-                <button onclick="aiTextTask('continue')" class="bg-purple-600/30 hover:bg-purple-600 text-[10px] px-3 py-1 rounded border border-purple-500/30 transition" data-i18n="btn_continue">Продовжити ✨</button>
-                <div id="word-status" class="ml-auto text-[9px] flex items-center opacity-50" data-i18n="status_ready">Готовий</div>
-            </div>
-            <div class="flex-grow overflow-auto">
-                <div id="word-editor" contenteditable="true" data-i18n="word_placeholder">Введіть текст тут...</div>
-            </div>
-        </div>
-        <div class="resizer"></div>
-    </div>
-
-    <!-- Terminal Window -->
-    <div class="window" id="win-terminal" style="width: 550px; height: 400px; top: 200px; left: 400px;">
-        <div class="window-header">
-            <span class="brand text-[9px] opacity-70" data-i18n="terminal_title">System Terminal</span>
+            <span class="brand text-[10px] opacity-70">System Console</span>
             <div class="control-btn btn-close" onclick="closeWin('terminal')"></div>
         </div>
-        <div class="flex flex-col h-full bg-black/80 font-mono text-xs text-emerald-500">
-            <div id="term-body" class="p-4 flex-grow overflow-y-auto leading-relaxed">
-                <div class="opacity-50">[aiOS 4.7 Kernel Loaded]</div>
-                <div class="opacity-50">[Security: API Key Active]</div>
-                <div class="opacity-50">[Status: AI Core Online]</div>
-                <div class="mt-2 text-white" data-i18n="term_welcome">Вітаємо у терміналі. Введіть запит.</div>
-            </div>
-            <div class="p-2 border-t border-white/10 flex">
-                <span class="mr-2">ai_user@os:~$</span>
-                <input type="text" id="term-input" class="bg-transparent outline-none flex-grow border-none text-white" onkeypress="if(event.key==='Enter') handleTermInput()">
-            </div>
+        <div id="term-body" class="p-4 flex-grow bg-black/90 font-mono text-[11px] text-emerald-500 overflow-y-auto space-y-1">
+            <div>> AI OS initialized...</div>
+            <div>> Kernel: 4.8.5-STABLE</div>
+            <div>> Resizable Core: ENABLED</div>
         </div>
-        <div class="resizer"></div>
     </div>
 
-    <!-- Taskbar -->
     <div class="taskbar">
         <div class="dock-item" onclick="openWin('factory')">🛠️</div>
-        <div class="dock-item" onclick="openWin('word')">📝</div>
         <div class="dock-item" onclick="openWin('terminal')">💻</div>
-        <div class="w-px h-6 bg-white/10 mx-1"></div>
-        <div class="lang-btn" id="lang-switcher" onclick="toggleLanguage()">UA</div>
-        <div id="clock" class="px-2 text-[11px] font-mono font-bold tracking-tighter opacity-80">00:00</div>
+        <div id="clock" class="ml-4 text-[10px] font-mono opacity-50">00:00</div>
     </div>
 
     <script>
-        const apiKey = "";
-        
-        // --- TRANSLATION DATA ---
-        const i18n = {
-            uk: {
-                factory_label: "App Factory",
-                word_label: "AI Word",
-                terminal_label: "Термінал",
-                factory_title: "App Factory v4.7",
-                factory_header: "Створити програму",
-                factory_sub: "AI ГЕНЕРАЦІЯ ДЛЯ ВАШОГО СТОЛА",
-                field_name: "Назва додатка",
-                field_desc: "Опис функцій",
-                btn_build: "Згенерувати ✨",
-                word_title: "AI Word Processor",
-                btn_fix: "Виправити помилки ✨",
-                btn_continue: "Продовжити текст ✨",
-                status_ready: "Готовий",
-                status_thinking: "Думаю...",
-                word_placeholder: "Введіть текст тут... ШІ допоможе його покращити.",
-                terminal_title: "Системний Термінал",
-                term_welcome: "Добро пожаловать в інтелектуальний термінал. Введіть питання.",
-                gen_loading: "⚡ ГЕНЕРУЮ КОД...",
-                gen_success: "ВСТАНОВЛЕНО!",
-                gen_error: "ПОМИЛКА.",
-                ai_sys_prompt: "Ти ядро операційної системи aiOS. Відповідай українською мовою лаконічно."
-            },
-            en: {
-                factory_label: "App Factory",
-                word_label: "AI Word",
-                terminal_label: "Terminal",
-                factory_title: "App Factory v4.7",
-                factory_header: "Create Application",
-                factory_sub: "AI GENERATION FOR YOUR DESKTOP",
-                field_name: "App Name",
-                field_desc: "Function Description",
-                btn_build: "Generate ✨",
-                word_title: "AI Word Processor",
-                btn_fix: "Fix Errors ✨",
-                btn_continue: "Continue Text ✨",
-                status_ready: "Ready",
-                status_thinking: "Thinking...",
-                word_placeholder: "Type text here... AI will help you.",
-                terminal_title: "System Terminal",
-                term_welcome: "Welcome to intelligent terminal. Enter any query.",
-                gen_loading: "⚡ GENERATING CODE...",
-                gen_success: "INSTALLED!",
-                gen_error: "ERROR.",
-                ai_sys_prompt: "You are the aiOS core. Answer in English concisely."
-            },
-            ru: {
-                factory_label: "App Factory",
-                word_label: "AI Word",
-                terminal_label: "Терминал",
-                factory_title: "App Factory v4.7",
-                factory_header: "Создать программу",
-                factory_sub: "AI ГЕНЕРАЦИЯ ДЛЯ ВАШЕГО СТОЛА",
-                field_name: "Название приложения",
-                field_desc: "Описание функций",
-                btn_build: "Сгенерировать ✨",
-                word_title: "AI Word Processor",
-                btn_fix: "Исправить ошибки ✨",
-                btn_continue: "Продолжить ✨",
-                status_ready: "Готов",
-                status_thinking: "Думаю...",
-                word_placeholder: "Введите текст здесь... ИИ поможет его улучшить.",
-                terminal_title: "Системный Терминал",
-                term_welcome: "Добро пожаловать в интеллектуальный терминал. Введите любой вопрос.",
-                gen_loading: "⚡ ГЕНЕРИРУЮ КОД...",
-                gen_success: "УСТАНОВЛЕНО!",
-                gen_error: "ОШИБКА.",
-                ai_sys_prompt: "Ты ядро операционной системы aiOS. Отвечай на русском языке лаконично."
-            }
-        };
+        const apiKey = ""; 
+        let currentIconBase64 = null;
+        let contextTargetAppId = null;
+        let zStack = 100;
 
-        let currentLang = 'uk';
-
-        function toggleLanguage() {
-            const langs = ['uk', 'en', 'ru'];
-            let idx = langs.indexOf(currentLang);
-            currentLang = langs[(idx + 1) % langs.length];
-            document.getElementById('lang-switcher').innerText = currentLang.toUpperCase();
-            applyLanguage();
-            logToTerminal(`System: Language changed to ${currentLang.toUpperCase()}`);
-        }
-
-        function applyLanguage() {
-            const langData = i18n[currentLang];
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (langData[key]) {
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                        el.placeholder = langData[key];
-                    } else {
-                        el.innerText = langData[key];
-                    }
-                }
-            });
-        }
-
-        // --- CORE AI HANDLER ---
-        async function askAI(prompt, systemPrompt = "") {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const sys = systemPrompt || i18n[currentLang].ai_sys_prompt;
-            
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: sys }] }
-            };
-
-            const backoff = [1000, 2000, 4000];
-            for(let i = 0; i < 3; i++) {
+        // --- Core Utility: API Fetch ---
+        async function apiRequest(url, body, retries = 5) {
+            for (let i = 0; i < retries; i++) {
                 try {
                     const response = await fetch(url, {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(payload)
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
                     });
-                    const data = await response.json();
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
-                } catch (e) {
-                    await new Promise(r => setTimeout(r, backoff[i]));
-                }
+                    if (response.ok) return await response.json();
+                } catch (e) {}
+                await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
             }
             return null;
         }
 
-        // --- APP FACTORY ---
+        async function generateAppIcon() {
+            const name = document.getElementById('app-name').value.trim();
+            if (!name) return logToTerminal("Error: Назва обов'язкова.", "text-red-400");
+            
+            const btn = document.getElementById('gen-icon-btn');
+            const preview = document.getElementById('icon-preview');
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loading-spinner"></div>`;
+            
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+            const result = await apiRequest(url, {
+                instances: { prompt: `Modern 3D app icon for "${name}", glass style, professional.` },
+                parameters: { sampleCount: 1 }
+            });
+
+            if (result?.predictions?.[0]) {
+                currentIconBase64 = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                preview.innerHTML = `<img src="${currentIconBase64}" class="w-full h-full object-cover">`;
+                logToTerminal(`System: Іконку створено для "${name}"`);
+            }
+            btn.disabled = false;
+            btn.innerHTML = `<span>🎨 Згенерувати іконку</span>`;
+        }
+
         async function buildApp() {
             const name = document.getElementById('app-name').value.trim();
             const desc = document.getElementById('app-desc').value.trim();
+            if (!name || !desc) return;
+
             const btn = document.getElementById('build-btn');
             const status = document.getElementById('build-status');
-            const lang = i18n[currentLang];
-
-            if(!name || !desc) return;
-
             btn.disabled = true;
-            status.innerText = lang.gen_loading;
-            logToTerminal(`System: Generating app "${name}"...`);
+            status.innerText = "SYNTHESIZING...";
 
-            const code = await askAI(
-                `Build a standalone web app: "${name}". Features: ${desc}. Interface Language: ${currentLang}. Use Tailwind CSS. Return ONLY HTML.`,
-                "You are an expert web developer. No markdown symbols."
-            );
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const result = await apiRequest(url, {
+                contents: [{ parts: [{ text: `Single-file HTML app. Name: ${name}. Concept: ${desc}. Use Tailwind.` }] }]
+            });
 
-            if(code) {
-                installApp(name, code);
-                status.innerText = lang.gen_success;
-                logToTerminal(`System: App "${name}" ready.`);
-            } else {
-                status.innerText = lang.gen_error;
+            const code = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (code) {
+                installApp(name, code.replace(/```html|```/g, "").trim(), currentIconBase64);
+                status.innerText = "DEPLOYED!";
             }
-
-            setTimeout(() => { status.innerText = ""; btn.disabled = false; }, 3000);
+            setTimeout(() => { btn.disabled = false; status.innerText = ""; }, 2000);
         }
 
-        function installApp(name, code) {
-            const appId = 'app_' + Date.now();
-            const icon = document.createElement('div');
-            icon.className = 'shortcut';
-            icon.onclick = () => openWin(appId);
-            icon.innerHTML = `<div class="shortcut-icon" style="background:rgba(139,92,246,0.1); border-color:rgba(139,92,246,0.3);">📦</div><div class="shortcut-label">${name}</div>`;
-            document.getElementById('desktop').appendChild(icon);
+        function installApp(name, code, iconData) {
+            const id = 'app_' + Date.now();
+            const shortcut = document.createElement('div');
+            shortcut.className = 'shortcut';
+            shortcut.dataset.appId = id;
+            shortcut.innerHTML = `<div class="shortcut-icon">${iconData ? `<img src="${iconData}">` : `📦`}</div><div class="shortcut-label">${name}</div>`;
+            shortcut.onclick = () => openWin(id);
+            shortcut.oncontextmenu = (e) => { e.preventDefault(); showContextMenu(e.clientX, e.clientY, id); };
+            document.getElementById('desktop').appendChild(shortcut);
 
             const win = document.createElement('div');
-            win.id = 'win-' + appId;
+            win.id = 'win-' + id;
             win.className = 'window';
-            win.style.cssText = `width:600px; height:500px; top:150px; left:150px;`;
+            win.style.cssText = `width:600px; height:400px; top:100px; left:100px;`;
+            win.onmousedown = () => focusWin(id);
             win.innerHTML = `
-                <div class="window-header"><span class="brand text-[9px] opacity-70">${name.toUpperCase()}</span><div class="control-btn btn-close" onclick="closeWin('${appId}')"></div></div>
-                <div class="flex-grow bg-white"><iframe id="iframe-${appId}" style="width:100%; height:100%; border:none;"></iframe></div>
-                <div class="resizer"></div>
+                <div class="window-header">
+                    <span class="brand text-[10px] uppercase">${name}</span>
+                    <div class="control-btn btn-close" onclick="closeWin('${id}')"></div>
+                </div>
+                <div class="flex-grow bg-[#05050a] relative overflow-hidden">
+                    <iframe id="frame-${id}" class="w-full h-full border-none"></iframe>
+                </div>
             `;
             document.body.appendChild(win);
+            const iframe = document.getElementById('frame-' + id).contentWindow.document;
+            iframe.open(); iframe.write(code); iframe.close();
             
-            const doc = document.getElementById('iframe-' + appId).contentWindow.document;
-            doc.open(); doc.write(code.replace(/```html|```/g, "").trim()); doc.close();
-            initWinActions(win);
-            openWin(appId);
+            initWin(win);
+            openWin(id);
         }
 
-        // --- AI WORD ---
-        async function aiTextTask(type) {
-            const editor = document.getElementById('word-editor');
-            const status = document.getElementById('word-status');
-            const lang = i18n[currentLang];
-            const content = editor.innerText;
-            if(content.length < 5) return;
-
-            status.innerText = lang.status_thinking;
+        // --- Window Management (Drag & Resize) ---
+        function initWin(win) {
+            const header = win.querySelector('.window-header');
             
-            const prompts = {
-                improve: `Исправь ошибки в тексте: "${content}". Язык: ${currentLang}`,
-                continue: `Продолжи текст (2 предложения): "${content}". Язык: ${currentLang}`
+            // Dragging
+            header.onmousedown = (e) => {
+                if (e.target.classList.contains('control-btn')) return;
+                focusWin(win.id);
+                const ox = e.clientX - win.offsetLeft;
+                const oy = e.clientY - win.offsetTop;
+                
+                document.onmousemove = (ev) => {
+                    win.style.left = ev.clientX - ox + 'px';
+                    win.style.top = ev.clientY - oy + 'px';
+                };
+                document.onmouseup = () => document.onmousemove = null;
             };
 
-            const result = await askAI(prompts[type], "Return ONLY the text result.");
-            
-            if(result) {
-                if(type === 'improve') editor.innerText = result.trim();
-                else editor.innerText += " " + result.trim();
-                status.innerText = "✨";
-            } else {
-                status.innerText = "Error";
+            // Create Resizers
+            const resizers = [
+                { cls: 'resizer-r', axis: 'x' },
+                { cls: 'resizer-b', axis: 'y' },
+                { cls: 'resizer-rb', axis: 'both' }
+            ];
+
+            resizers.forEach(r => {
+                const handle = document.createElement('div');
+                handle.className = `resizer ${r.cls}`;
+                win.appendChild(handle);
+
+                handle.onmousedown = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    focusWin(win.id);
+                    win.classList.add('window-resizing');
+
+                    const startW = win.offsetWidth;
+                    const startH = win.offsetHeight;
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+
+                    document.onmousemove = (ev) => {
+                        if (r.axis === 'x' || r.axis === 'both') {
+                            win.style.width = Math.max(300, startW + (ev.clientX - startX)) + 'px';
+                        }
+                        if (r.axis === 'y' || r.axis === 'both') {
+                            win.style.height = Math.max(200, startH + (ev.clientY - startY)) + 'px';
+                        }
+                    };
+
+                    document.onmouseup = () => {
+                        win.classList.remove('window-resizing');
+                        document.onmousemove = null;
+                    };
+                };
+            });
+        }
+
+        function focusWin(id) {
+            zStack++;
+            const win = id.startsWith('win-') ? document.getElementById(id) : document.getElementById('win-' + id);
+            if (win) {
+                document.querySelectorAll('.window').forEach(w => w.classList.remove('window-active'));
+                win.style.zIndex = zStack;
+                win.classList.add('window-active');
             }
-            setTimeout(() => status.innerText = lang.status_ready, 2000);
         }
 
-        // --- TERMINAL ---
-        async function handleTermInput() {
-            const input = document.getElementById('term-input');
-            const body = document.getElementById('term-body');
-            const cmd = input.value.trim();
-            if(!cmd) return;
-
-            body.innerHTML += `<div class="text-white mt-1">> ${cmd}</div>`;
-            input.value = "";
-            body.scrollTop = body.scrollHeight;
-
-            if(cmd.toLowerCase() === 'clear') { body.innerHTML = ""; return; }
-
-            const loading = document.createElement('div');
-            loading.className = "opacity-50 animate-pulse";
-            loading.innerText = "[AI Core processing...]";
-            body.appendChild(loading);
-
-            const response = await askAI(cmd);
-            
-            loading.remove();
-            body.innerHTML += `<div class="text-emerald-300 mt-1">${response || "No response."}</div>`;
-            body.scrollTop = body.scrollHeight;
-        }
-
-        // --- WIN SYSTEM ---
         function openWin(id) {
             const win = document.getElementById('win-' + id);
-            if(win) { win.style.display = 'flex'; focusWin(win); }
-        }
-        function closeWin(id) { 
-            const win = document.getElementById('win-' + id);
-            if(win) win.style.display = 'none'; 
-        }
-        function focusWin(win) {
-            document.querySelectorAll('.window').forEach(w => w.classList.remove('window-active'));
-            win.classList.add('window-active');
+            if (win) { win.style.display = 'flex'; focusWin(id); }
         }
 
-        function initWinActions(win) {
-            const header = win.querySelector('.window-header');
-            const resizer = win.querySelector('.resizer');
-            header.onmousedown = (e) => {
-                if(e.target.classList.contains('control-btn')) return;
-                focusWin(win);
-                let ox = e.clientX - win.offsetLeft, oy = e.clientY - win.offsetTop;
-                document.onmousemove = (ev) => { win.style.left = ev.clientX - ox + 'px'; win.style.top = ev.clientY - oy + 'px'; };
-                document.onmouseup = () => document.onmousemove = null;
-            };
-            resizer.onmousedown = (e) => {
-                e.preventDefault();
-                let sw = win.offsetWidth, sh = win.offsetHeight, sx = e.clientX, sy = e.clientY;
-                document.onmousemove = (ev) => { win.style.width = Math.max(300, sw + (ev.clientX - sx)) + 'px'; win.style.height = Math.max(200, sh + (ev.clientY - sy)) + 'px'; };
-                document.onmouseup = () => document.onmousemove = null;
-            };
-            win.onmousedown = () => focusWin(win);
+        function closeWin(id) {
+            document.getElementById('win-' + id).style.display = 'none';
         }
 
-        function logToTerminal(msg) {
+        function showContextMenu(x, y, id) {
+            const menu = document.getElementById('context-menu');
+            contextTargetAppId = id;
+            menu.style.left = x + 'px'; menu.style.top = y + 'px'; menu.style.display = 'block';
+        }
+
+        function deleteTargetApp() {
+            document.querySelector(`.shortcut[data-app-id="${contextTargetAppId}"]`)?.remove();
+            document.getElementById('win-' + contextTargetAppId)?.remove();
+        }
+
+        function logToTerminal(msg, color = "text-emerald-500") {
             const body = document.getElementById('term-body');
-            if(body) {
-                body.innerHTML += `<div class="opacity-50 mt-1">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
-                body.scrollTop = body.scrollHeight;
-            }
+            const entry = document.createElement('div');
+            entry.className = color;
+            entry.innerText = `> ${msg}`;
+            body.appendChild(entry);
+            body.scrollTop = body.scrollHeight;
         }
 
-        document.querySelectorAll('.window').forEach(initWinActions);
-        setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        }, 1000);
-        
-        applyLanguage();
+        document.addEventListener('click', () => document.getElementById('context-menu').style.display = 'none');
+
+        window.onload = () => {
+            document.querySelectorAll('.window').forEach(initWin);
+            setInterval(() => {
+                document.getElementById('clock').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }, 1000);
+        };
     </script>
 </body>
 </html>
